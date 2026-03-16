@@ -10,6 +10,10 @@ type RPC = {
 				params: {};
 				response: void;
 			};
+			exitVictor: {
+				params: {};
+				response: void;
+			};
 		};
 		messages: {};
 	}>;
@@ -48,6 +52,9 @@ const RPC = BrowserView.defineRPC<RPC>({
 			openDevTools: () => {
 				mainWindow.webview.openDevTools();
 			},
+			exitVictor: () => {
+				mainWindow.close();
+			}
 		},
 	},
 });

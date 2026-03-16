@@ -9,7 +9,10 @@
 
   type RPC = {
     bun: RPCSchema<{
-      requests: { openDevTools: { params: {}; response: void } };
+      requests: {
+        openDevTools: { params: {}; response: void };
+        exitVictor: { params: {}; response: void };
+      };
       messages: {};
     }>;
     webview: RPCSchema<{
@@ -32,40 +35,31 @@
 
   onMount(() => {
     setTimeout(() => {
-      loading = false;
       const canvas = document.createElement("canvas");
-      const gl = canvas.getContext("webgl2");
+      const gl2 = canvas.getContext("webgl2");
+      const gl1 = canvas.getContext("webgl");
 
-      if (!gl) {
-        // This will often tell you if it's "blocked" vs "unsupported"
-        const debugInfo = canvas
-          .getContext("webgl")
-          ?.getExtension("WEBGL_debug_renderer_info");
-        console.log(
-          "Renderer:",
-          debugInfo
-            ? canvas
-                .getContext("webgl")
-                .getParameter(debugInfo.UNMASKED_RENDERER_ID)
-            : "Unknown",
+      console.log("WebGL 2 support:", !!gl2);
+      console.log("WebGL 1 support:", !!gl1);
+
+      if (!gl2 && !gl1) {
+        console.error(
+          "GPU Acceleration is totally disabled in this CEF instance.",
         );
+        error = "GPU Acceleration disabled in CEF!";
       }
+
+      loading = false;
+
+      window.addEventListener("keydown", (event) => {
+        if (event.code === "KeyG") {
+          rpc!.request("exitVictor", {});
+        }
+      });
     }, 1000);
   });
 
   let error = $state("");
-
-  const canvas = document.createElement("canvas");
-  const gl2 = canvas.getContext("webgl2");
-  const gl1 = canvas.getContext("webgl");
-
-  console.log("WebGL 2 support:", !!gl2);
-  console.log("WebGL 1 support:", !!gl1);
-
-  if (!gl2 && !gl1) {
-    console.error("GPU Acceleration is totally disabled in this CEF instance.");
-    error = "GPU Acceleration disabled in CEF!";
-  }
 </script>
 
 {#if error}
@@ -74,14 +68,14 @@
       Victor heeft een dodelijke error opgelopen.
     </p>
     <p style="color: white;">{error}</p>
-          <button onclick={() => rpc!.request("openDevTools", {})}>
-        Open DevTools
-      </button>
-            <button
-        onclick={() => {
-          location.reload();
-        }}>Reset victor</button
-      >
+    <button onclick={() => rpc!.request("openDevTools", {})}>
+      Open DevTools
+    </button>
+    <button
+      onclick={() => {
+        location.reload();
+      }}>Reset victor</button
+    >
   </div>
 {:else if !loading}
   <div class="main">
@@ -97,6 +91,9 @@
       </button>
       <button onclick={() => (location.href = "https://google.com")}>
         Unblocked google.com
+      </button>
+      <button onclick={() => rpc!.request("exitVictor", {})}>
+        Exit (G)
       </button>
     </div>
   </div>
