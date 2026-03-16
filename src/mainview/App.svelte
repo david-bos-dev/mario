@@ -33,18 +33,27 @@
   onMount(() => {
     setTimeout(() => {
       loading = false;
-              const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl2");
-    
-    if (!gl) {
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl2");
+
+      if (!gl) {
         // This will often tell you if it's "blocked" vs "unsupported"
-        const debugInfo = canvas.getContext("webgl")?.getExtension('WEBGL_debug_renderer_info');
-        console.log("Renderer:", debugInfo ? canvas.getContext("webgl").getParameter(debugInfo.UNMASKED_RENDERER_ID) : "Unknown");
-    }
+        const debugInfo = canvas
+          .getContext("webgl")
+          ?.getExtension("WEBGL_debug_renderer_info");
+        console.log(
+          "Renderer:",
+          debugInfo
+            ? canvas
+                .getContext("webgl")
+                .getParameter(debugInfo.UNMASKED_RENDERER_ID)
+            : "Unknown",
+        );
+      }
     }, 1000);
-
-
   });
+
+  let error = $state("");
 
   const canvas = document.createElement("canvas");
   const gl2 = canvas.getContext("webgl2");
@@ -55,11 +64,26 @@
 
   if (!gl2 && !gl1) {
     console.error("GPU Acceleration is totally disabled in this CEF instance.");
+    error = "GPU Acceleration disabled in CEF!";
   }
-
 </script>
 
-{#if !loading}
+{#if error}
+  <div class="center">
+    <p style="font-size: 3rem; color: red">
+      Victor heeft een dodelijke error opgelopen.
+    </p>
+    <p style="color: white;">{error}</p>
+          <button onclick={() => rpc!.request("openDevTools", {})}>
+        Open DevTools
+      </button>
+            <button
+        onclick={() => {
+          location.reload();
+        }}>Reset victor</button
+      >
+  </div>
+{:else if !loading}
   <div class="main">
     <Emulator />
     <div class="bottombar">
@@ -70,6 +94,9 @@
       >
       <button onclick={() => rpc!.request("openDevTools", {})}>
         Open DevTools
+      </button>
+      <button onclick={() => (location.href = "https://google.com")}>
+        Unblocked google.com
       </button>
     </div>
   </div>

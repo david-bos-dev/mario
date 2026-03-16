@@ -22,18 +22,6 @@ export default {
 		linux: {
 			bundleCEF: true,
 			defaultRenderer: 'cef',
-			chromiumFlags: {
-				"enable-gpu": true,
-				"ignore-gpu-blocklist": true,
-				// Crucial for WebGL/WebGL2 on many Linux distros:
-				"use-gl": "desktop",
-				"enable-webgl": true,
-				"enable-webgl2": true,
-				// If "disable-gpu-sandbox" didn't work, try this:
-				"no-sandbox": true,
-				// Force the GPU rasterizer
-				"enable-gpu-rasterization": true,
-			}
 		},
 		win: {
 			bundleCEF: false,

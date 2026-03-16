@@ -3,7 +3,8 @@
 
   // Define your "env variables" as props
   export let core = "n64";
-  export let gameUrl = "/rom.zip";
+  export let gameUrl = window.location.origin + "/rom.zip";
+  const dataPath = window.location.origin + "/data/";
 
   let gameContainer;
 
@@ -14,7 +15,7 @@
     // @ts-ignore
     window.EJS_core = core;
     // @ts-ignore
-    window.EJS_pathtodata = "/data/";
+    window.EJS_pathtodata = dataPath;
     // @ts-ignore
     window.EJS_gameUrl = gameUrl;
 
