@@ -11,8 +11,8 @@ export default {
 		copy: {
 			"dist/index.html": "views/mainview/index.html",
 			"dist/assets": "views/mainview/assets",
-			"static/data": "views/data",
-			"static/rom.zip": "views/rom.zip",
+			"static/data": "views/mainview/data",
+			"static/rom.zip": "views/mainview/rom.zip",
 		},
 		// Ignore Vite output in watch mode — HMR handles view rebuilds separately
 		watchIgnore: ["dist/**"],
