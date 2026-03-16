@@ -51,11 +51,19 @@
 
       loading = false;
 
-      window.addEventListener("keydown", (event) => {
-        if (event.code === "KeyG") {
-          rpc!.request("exitVictor", {});
-        }
-      });
+      window.addEventListener(
+        "keydown",
+        (event) => {
+          if (event.code === "KeyG") {
+            // Stop de game van het zien van deze G
+            event.stopPropagation();
+            event.preventDefault();
+
+            rpc!.request("exitVictor", {});
+          }
+        },
+        true,
+      ); // <--- De 'true' hier activeert Capturing mode
     }, 1000);
   });
 
@@ -92,9 +100,7 @@
       <button onclick={() => (location.href = "https://google.com")}>
         Unblocked google.com
       </button>
-      <button onclick={() => rpc!.request("exitVictor", {})}>
-        Exit (G)
-      </button>
+      <button onclick={() => rpc!.request("exitVictor", {})}> Exit (G) </button>
     </div>
   </div>
 {:else}
@@ -117,13 +123,20 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+  }
+
+  :global(.main > :first-child) {
+    flex: 1;
+    min-height: 0;
   }
 
   .bottombar {
     background-color: black;
     padding: 0.5rem;
+    height: auto; /* Zorg dat dit een vaste hoogte heeft of gerespecteerd wordt */
+    flex-shrink: 0; /* Belangrijk: voorkom dat de bar inkrimpt tot 0px */
   }
-
   button {
     color: black;
     background-color: white;
