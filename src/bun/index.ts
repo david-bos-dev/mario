@@ -52,7 +52,7 @@ const RPC = BrowserView.defineRPC<RPC>({
 	},
 });
 
-mainWindow= new BrowserWindow({
+mainWindow = new BrowserWindow({
 	title: "DE PEAK VICTOR EMULATOR",
 	url,
 	rpc: RPC,
@@ -63,9 +63,6 @@ mainWindow= new BrowserWindow({
 		y: 200,
 	}
 });
-
-mainWindow.maximize();
-
 
 
 console.log("Svelte app started!");
