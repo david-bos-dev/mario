@@ -46,7 +46,7 @@
         console.error(
           "GPU Acceleration is totally disabled in this CEF instance.",
         );
-        //error = "GPU Acceleration disabled in CEF!";
+        error = "GPU Acceleration disabled in CEF!";
       }
 
       loading = false;
