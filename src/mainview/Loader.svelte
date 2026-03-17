@@ -1,6 +1,6 @@
 <p style="font-size: 2rem;">PEAK Victor Emulator</p>
 <span class="loader"></span>
-<p style="font-size: 2rem;">...</p>
+<p style="font-size: 0.5rem;">Gebruik op eigen risico en eigen verantwoordelijkheid. </p>
 <p>Laden...</p>
 <style>
   .loader {
