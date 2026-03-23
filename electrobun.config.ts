@@ -27,4 +27,7 @@ export default {
 			bundleCEF: false,
 		},
 	},
+	release: {
+        baseUrl: "https://github.com/david-bos-dev/mario/releases/latest/download",
+    }
 } satisfies ElectrobunConfig;

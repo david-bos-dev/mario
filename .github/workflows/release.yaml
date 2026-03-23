@@ -1,0 +1,60 @@
+name: Build and Release Windows
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      # 1. Restore the 'artifacts' folder from the previous run
+      - name: Restore Previous Build for Patching
+        uses: actions/cache@v4
+        with:
+          path: artifacts/
+          # github.event.before refers to the commit before the current push
+          key: ${{ runner.os }}-electrobun-artifacts-${{ github.event.before }}
+          restore-keys: |
+            ${{ runner.os }}-electrobun-artifacts-
+
+      # 2. Build the app
+      # Electrobun will check 'artifacts/' for the old .zst to create the .patch
+      - name: Build Electrobun App
+        run: bunx electrobun build --env=stable
+
+      # 3. Upload specifically from the artifacts folder
+      - name: Release to GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/*.exe
+            artifacts/*.zst
+            artifacts/*.patch
+            artifacts/update.json
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 4. Save the current artifacts for the NEXT release's patch generation
+      - name: Cache Current Build
+        uses: actions/cache/save@v4
+        with:
+          path: artifacts/
+          key: ${{ runner.os }}-electrobun-artifacts-${{ github.sha }}
