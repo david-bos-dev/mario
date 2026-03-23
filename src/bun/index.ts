@@ -1,4 +1,29 @@
 import { BrowserView, BrowserWindow, RPCSchema, Updater } from "electrobun/bun";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+
+// Set up the log file path (Saves to C:\Users\YOUR_NAME\AppData\Local\Temp\victor_log.txt on Windows)
+const logPath = path.join(os.tmpdir(), "victor_log.txt");
+
+// Custom logging function
+function debugLog(message: string) {
+    // 1. Log to the normal console (for when you run 'bun run dev')
+    console.log(message);
+    
+    // 2. Append to the text file (for when running the production .exe)
+    const timestamp = new Date().toLocaleTimeString();
+    try {
+        fs.appendFileSync(logPath, `[${timestamp}] - ${message}\n`);
+    } catch (e) {
+        // Failsafe just in case there are file permission issues
+        console.error("Failed to write to log file", e);
+    }
+}
+
+// Print where the log file is located right at startup
+debugLog(`=== APP STARTING ===`);
+debugLog(`Log file located at: ${logPath}`);
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://127.0.0.1:${DEV_SERVER_PORT}`;
@@ -11,7 +36,6 @@ type RPC = {
         };
         messages: {};
     }>;
-    // 1. ADD MESSAGES TO THE WEBVIEW
     webview: RPCSchema<{
         requests: {};
         messages: {
@@ -27,10 +51,10 @@ async function getMainViewUrl(): Promise<string> {
     if (channel === "dev") {
         try {
             await fetch(DEV_SERVER_URL, { method: "HEAD" });
-            console.log(`HMR enabled: Using Vite dev server at ${DEV_SERVER_URL}`);
+            debugLog(`HMR enabled: Using Vite dev server at ${DEV_SERVER_URL}`);
             return DEV_SERVER_URL;
         } catch {
-            console.log("Vite dev server not running. Run 'bun run dev:hmr' for HMR support.");
+            debugLog("Vite dev server not running. Run 'bun run dev:hmr' for HMR support.");
         }
     }
     return "views://mainview/index.html";
@@ -61,22 +85,30 @@ mainWindow = new BrowserWindow({
     }
 });
 
-console.log("Svelte app started!");
+debugLog("Svelte app window created!");
 
 async function enforceUpdatesIfOnline() {
     const channel = await Updater.localInfo.channel();
-    if (channel === "dev") return;
+    if (channel === "dev") {
+        debugLog("Skipping auto-updates because we are in DEV mode.");
+        return;
+    }
 
     try {
+        debugLog("Checking for updates in the background...");
         const updateAvailable = await Updater.checkForUpdate();
 
         if (updateAvailable) {
+            debugLog("Update found! Starting download...");
             await Updater.downloadUpdate();
 
+            debugLog("Download complete. Applying update and restarting...");
             await Updater.applyUpdate(); 
+        } else {
+            debugLog("App is already up to date. No update found.");
         }
     } catch (error) {
-        console.log("User is offline or update check failed. Proceeding normally.");
+        debugLog(`User is offline or update check failed. Proceeding normally. Error details: ${String(error)}`);
     }
 }
 
