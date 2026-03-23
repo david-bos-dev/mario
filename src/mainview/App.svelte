@@ -101,7 +101,7 @@
         Unblocked google.com
       </button>
       <button onclick={() => rpc!.request("exitVictor", {})}> Exit (G) </button>
-      <button onclick={() => location.href = __BUILD_INFO__.commitUrl}>{__BUILD_INFO__.buildTime}</button>
+      <span>Build on {__BUILD_INFO__.buildTime.toLocaleDateString()}</span>
     </div>
   </div>
 {:else}
