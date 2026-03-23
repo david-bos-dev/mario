@@ -22,22 +22,28 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      # 1. Restore the 'artifacts' folder from the previous run
+      # 1. BUILD YOUR FRONTEND FIRST
+      # Electrobun failed because D:\a\mario\mario\dist\index.html was missing.
+      # Replace 'bun run build' with your actual frontend build command.
+      - name: Build Frontend
+        run: bun run build 
+
+      # 2. Restore 'artifacts' for patch generation
       - name: Restore Previous Build for Patching
         uses: actions/cache@v4
         with:
           path: artifacts/
-          # github.event.before refers to the commit before the current push
           key: ${{ runner.os }}-electrobun-artifacts-${{ github.event.before }}
           restore-keys: |
             ${{ runner.os }}-electrobun-artifacts-
 
-      # 2. Build the app
-      # Electrobun will check 'artifacts/' for the old .zst to create the .patch
+      # 3. Build the Electrobun App
       - name: Build Electrobun App
         run: bunx electrobun build --env=stable
 
-      # 3. Upload specifically from the artifacts folder
+      # 4. Release to GitHub
+      # Based on your logs, the .exe and .zst are moved to 'artifacts/' at the end.
+      # Using 'artifacts/**/*' ensures we grab everything inside that folder recursively.
       - name: Release to GitHub
         uses: softprops/action-gh-release@v2
         with:
@@ -46,13 +52,14 @@ jobs:
             artifacts/*.zst
             artifacts/*.patch
             artifacts/update.json
+            artifacts/*.zip
           generate_release_notes: true
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 4. Save the current artifacts for the NEXT release's patch generation
+      # 5. Cache the artifacts for the next version's patch
       - name: Cache Current Build
         uses: actions/cache/save@v4
         with:
