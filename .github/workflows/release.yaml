@@ -24,7 +24,7 @@ jobs:
 
       # 1. Build the frontend UI so Electrobun has something to bundle
       - name: Build Frontend
-        run: bun run build 
+        run: bun run build:stable
 
       # 2. Build the Electrobun app
       # Next time this runs, it will automatically download the .zst from 
