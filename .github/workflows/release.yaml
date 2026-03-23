@@ -22,13 +22,24 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      # ZERO-WAIT CDN BYPASS
+      # This grabs the exact previous tag and rewrites your config file on the fly
+      # so Electrobun hits the direct download link instead of the cached 'latest' link.
+      - name: Bypass GitHub CDN Cache
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PREV_TAG=$(curl -sL -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+          echo "Previous release found: $PREV_TAG"
+          sed -i "s|releases/latest/download|releases/download/$PREV_TAG|g" electrobun.config.ts
+          echo "Config temporarily rewritten to bypass cache! Let's go!"
+
       # 1. Build the frontend UI so Electrobun has something to bundle
       - name: Build
         run: bun run build:stable
 
       # 3. Upload everything to the GitHub Release
-      # We check both the 'artifacts' folder (where Electrobun moves final files)
-      # and the 'build' folder (just in case) to be absolutely bulletproof.
       - name: Release to GitHub
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
@@ -49,12 +60,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # 4. Cache the build output for faster subsequent runs
-      - name: Cache Current Build
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            build/stable-win-x64/
-            artifacts/
-          key: ${{ runner.os }}-electrobun-${{ github.sha }}
