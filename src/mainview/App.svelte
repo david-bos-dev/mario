@@ -6,6 +6,7 @@
   import type { RPCSchema } from "electrobun/view";
 
   let loading = $state(true);
+  let timeover = $state(false);
 
   type RPC = {
     bun: RPCSchema<{
@@ -49,6 +50,18 @@
         error = "GPU Acceleration disabled in CEF!";
       }
 
+      // Define the target date: March 26, 2026
+    // Note: Months are 0-indexed in JavaScript/TypeScript (0 = Jan, 2 = March)
+    const targetDate = new Date(2026, 2, 26);
+    const now = new Date();
+
+    if (now > targetDate) {
+      console.log("It is now later than March 26, 2026.");
+      timeover = true;
+    } else {
+      console.log("We haven't reached that date yet.");
+    }
+
       loading = false;
 
       window.addEventListener(
@@ -70,7 +83,15 @@
   let error = $state("");
 </script>
 
-{#if error}
+
+{#if timeover}
+  <div class="center">
+    <p style="font-size: 3rem; color: red">
+      Victor heeft een dodelijke error opgelopen.
+    </p>
+    <p style="color: white;">Deze VICTOR emulator versie is verlopen. Vraag om een nieuwe!</p>
+  </div>
+{:else if error}
   <div class="center">
     <p style="font-size: 3rem; color: red">
       Victor heeft een dodelijke error opgelopen.
