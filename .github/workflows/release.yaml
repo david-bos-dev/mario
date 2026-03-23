@@ -23,14 +23,8 @@ jobs:
         run: bun install
 
       # 1. Build the frontend UI so Electrobun has something to bundle
-      - name: Build Frontend
+      - name: Build
         run: bun run build:stable
-
-      # 2. Build the Electrobun app
-      # Next time this runs, it will automatically download the .zst from 
-      # your current release and generate the .patch file.
-      - name: Build Electrobun App
-        run: bunx electrobun build --env=stable
 
       # 3. Upload everything to the GitHub Release
       # We check both the 'artifacts' folder (where Electrobun moves final files)
