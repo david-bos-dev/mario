@@ -22,46 +22,29 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      # 1. BUILD YOUR FRONTEND FIRST
-      # Electrobun failed because D:\a\mario\mario\dist\index.html was missing.
-      # Replace 'bun run build' with your actual frontend build command.
       - name: Build Frontend
         run: bun run build 
 
-      # 2. Restore 'artifacts' for patch generation
-      - name: Restore Previous Build for Patching
-        uses: actions/cache@v4
-        with:
-          path: artifacts/
-          key: ${{ runner.os }}-electrobun-artifacts-${{ github.event.before }}
-          restore-keys: |
-            ${{ runner.os }}-electrobun-artifacts-
 
-      # 3. Build the Electrobun App
       - name: Build Electrobun App
         run: bunx electrobun build --env=stable
-
-      # 4. Release to GitHub
-      # Based on your logs, the .exe and .zst are moved to 'artifacts/' at the end.
-      # Using 'artifacts/**/*' ensures we grab everything inside that folder recursively.
       - name: Release to GitHub
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            artifacts/*.exe
-            artifacts/*.zst
-            artifacts/*.patch
-            artifacts/update.json
-            artifacts/*.zip
+            build/stable-win-x64/*.exe
+            build/stable-win-x64/*.zst
+            build/stable-win-x64/*.zip
+            build/stable-win-x64/update.json
           generate_release_notes: true
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 5. Cache the artifacts for the next version's patch
       - name: Cache Current Build
         uses: actions/cache/save@v4
         with:
-          path: artifacts/
-          key: ${{ runner.os }}-electrobun-artifacts-${{ github.sha }}
+          path: |
+            build/stable-win-x64/
+            artifacts/
+          key: ${{ runner.os }}-electrobun-${{ github.sha }}
