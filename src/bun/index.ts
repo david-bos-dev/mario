@@ -96,10 +96,12 @@ async function enforceUpdatesIfOnline() {
 
     try {
         debugLog("Checking for updates in the background...");
-        const updateAvailable = await Updater.checkForUpdate();
+        // 1. Get the update info object
+        const updateInfo = await Updater.checkForUpdate();
 
-        if (updateAvailable) {
-            debugLog("Update found! Starting download...");
+        // 2. Check the specific boolean inside the object
+        if (updateInfo && updateInfo.updateAvailable) {
+            debugLog(`Update found! Version: ${updateInfo.version}. Starting download...`);
             await Updater.downloadUpdate();
 
             debugLog("Download complete. Applying update and restarting...");
