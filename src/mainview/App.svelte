@@ -52,7 +52,7 @@
 
       // Define the target date: March 26, 2026
     // Note: Months are 0-indexed in JavaScript/TypeScript (0 = Jan, 2 = March)
-    const targetDate = new Date(2026, 2, 26);
+    const targetDate = new Date(2026, 3, 4);
     const now = new Date();
 
     if (now > targetDate) {
@@ -87,7 +87,7 @@
 {#if timeover}
   <div class="center">
     <p style="font-size: 3rem; color: red">
-      Victor heeft een dodelijke error opgelopen.
+      Victor is overleden.
     </p>
     <p style="color: white;">Deze VICTOR emulator versie is verlopen. Vraag om een nieuwe!</p>
   </div>
