@@ -50,7 +50,7 @@
         error = "GPU Acceleration disabled in CEF!";
       }
 
-      // Define the target date: March 26, 2026
+      // Define the target date
     // Note: Months are 0-indexed in JavaScript/TypeScript (0 = Jan, 2 = March)
     const targetDate = new Date(2026, 5, 5);
     const now = new Date();
